@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+
+  db:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: 1c-bitrix
+    volumes:
+      - 1cb-db:/var/lib/mysql
+    networks:
+      - 1cb-network
+
+  backend:
+    build:
+      context: ./php/
+    restart: unless-stopped
+    depends_on: 
+      - db
+    volumes:
+      - ./logs/:/var/log/php_errors.log
+      - bitrix-src:/var/www/html/
+    networks:
+      - 1cb-network
+
+  webserver:
+    build:
+      context: ./apache2/
+    restart: unless-stopped
+    depends_on: 
+      - backend
+    volumes:
+      - bitrix-src:/var/www/html/
+    networks:
+      1cb-network:
+        ipv4_address: 172.70.0.4
+
+networks:
+  1cb-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.70.0.1/24
+
+volumes:
+  1cb-db:
+  bitrix-src:
