@@ -12,4 +12,4 @@ RUN apt update && apt install -y libzip-dev zip mc nano libfreetype6-dev libjpeg
 
 RUN curl "https://www.1c-bitrix.ru/download/files/scripts/bitrixsetup.php" --output /var/www/html/bitrixsetup.php
 
-CMD ["php-fpm"]
+CMD /bin/bash -c "mkdir -p -m 777 /var/log/php && touch /var/log/php/xdebug.log && chmod 666 /var/log/php/xdebug.log && php-fpm"
